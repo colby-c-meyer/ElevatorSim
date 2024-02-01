@@ -161,10 +161,8 @@ public class ElevatorController {
 						// Now that everybody is on board, validate you're not overweight
 						if ( this.car.isOverweight()) {
 							this.activeState = ElevatorState.NUM_PASSENGERS;
-							// everybody out ...
-							car.getPassengers().clear();
-							// except the operator
-							car.addPerson(this.operator);
+							// everybody out
+							this.resetElevatorCar();
 							
 							String message = String.format("I'm sorry, we've exceeded the weight limit, I weigh %d pounds and the elevator " +
 														"can only hold %d pounds.\n Please re-organize your group so that the " +
@@ -211,12 +209,7 @@ public class ElevatorController {
 					moveElevatorCar();
 					if ( this.car.getDesiredFloor() == 1) {
 						
-						//reset the elevator to empty
-						this.car.getPassengers().clear();
-						this.car.setCurrentCapacity(0);
-						this.car.setCurrentWeight(0);
-						// adding a person sets the weight and capacity correctly
-						this.car.addPerson(this.operator);
+						this.resetElevatorCar();
 						
 						this.userInterface.issueUserGreeting();
 					}
@@ -249,6 +242,19 @@ public class ElevatorController {
 			this.car.setCurrentFloor(this.car.getDesiredFloor());
 			this.userInterface.elevatorInUse(currentFloor, this.car.getDesiredFloor() );
 		}
+	}
+	
+	/**
+	 * remove everybody except for the operator
+	 */
+	private void resetElevatorCar() {
+		
+		//reset the elevator to empty
+		this.car.getPassengers().clear();
+		this.car.setCurrentCapacity(0);
+		this.car.setCurrentWeight(0);
+		// adding a person sets the weight and capacity correctly
+		this.car.addPerson(this.operator);
 	}
 	
 	
