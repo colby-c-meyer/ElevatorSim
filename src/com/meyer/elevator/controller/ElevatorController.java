@@ -127,6 +127,11 @@ public class ElevatorController {
 				// validate that user provided an integer, if not return error
 				try {
 					Integer numPassengers = Integer.valueOf(userInput);
+					
+					if ( numPassengers < 1) {
+						String message = String.format("What would be the point of using the elevator with nobody aboard, this is not a toy");
+						this.userInterface.getNumPassengers(message);
+					}
 					if ( numPassengers > this.car.getCapacity()) {
 						String message = String.format("The car only holds %s passengers, of which I am one, please tell %s folks to wait in the lobby"
 													, String.valueOf(car.getCapacity())
@@ -248,6 +253,10 @@ public class ElevatorController {
 	 */
 	private void moveElevatorCar() throws Exception {
 		
+		if (this.car.getDesiredFloor() < 1 ) {
+			String message = String.format("I'm sorry, this building does not have a basement, please enter a valid floor number", this.building.getNumberOfFloors());
+			this.userInterface.getDesiredFloor(message);
+		}
 		if (this.car.getDesiredFloor() > this.building.getNumberOfFloors()) {
 			String message = String.format("I'm sorry, this building only has %d floors, Please enter a valid floor number", this.building.getNumberOfFloors());
 			this.userInterface.getDesiredFloor(message);

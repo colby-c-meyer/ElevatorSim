@@ -91,7 +91,7 @@ public class UserInterface {
 	}
 	
 	/**
-	 * elevatorInUse is moving the elevator between floors, there is 
+	 * elevatorInUse is moving the elevator between floors, show current floor info 
 	 * @param currentFloor
 	 * @param desiredFloor
 	 * @throws Exception
@@ -103,13 +103,15 @@ public class UserInterface {
 		
 	}
 	
+	/**
+	 * elevator has arrived at a target floor, passengers do their thing
+	 * @param currentFloor
+	 */
 	public void elevatorWaiting(Integer currentFloor) {
 		System.out.println(String.format(" Here we are, floor number %d", currentFloor));
 		System.out.println("I'll wait here for you, when you're done, come back and tell me what floor you would like next");
 		this.controller.acceptUserInput(scanner.next());
 	}
-	
-	
 	
 	public void evacuateTheBuilding() {
 		System.out.println("Oh my something terrible has happened! Please take the stairs and evacuate");
