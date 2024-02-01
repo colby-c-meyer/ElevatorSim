@@ -17,7 +17,7 @@ as this is a very simple example, only 1 class exits
 ### View Package
 contains the user interface component(s) for the application. Being that this is a command line simulator
 only very basic UI components are defined, in a single file
-HOWEVEVR
+#### HOWEVEVR
 If you wanted to get fancy you could very easily implement JavaFX or Swing components and put them in here
 and the logic itself wouldn't necessarily have to change in the controller.
 you would just rewrite the UserInterface class to be a delegate which would then call / display the
