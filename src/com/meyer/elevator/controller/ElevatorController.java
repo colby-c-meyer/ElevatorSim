@@ -1,7 +1,5 @@
 package com.meyer.elevator.controller;
 
-
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,8 +36,8 @@ public class ElevatorController {
 	private static final Integer INDIVIDUAL_WEIGHT_LIMIT = 250;
 	
 	// Enhancement - pull all of the following from a properties file
-	private String BUILDING_NAME = "The Empire State Building";
-	private String OPERATOR_NAME = "Jimmy Smits";
+	private String BUILDING_NAME = "Nakatomi Plaza";
+	private String OPERATOR_NAME = "Hans Gruber";
 	private String OPERATOR_GLOVE_COLOR = "White";
 	private Integer OPERATOR_WEIGHT = 175;
 	
@@ -100,6 +98,9 @@ public class ElevatorController {
 	 * acceptUserInput is the "callback" method from the UserInterface
 	 * any input is processed through here and depending on our state 
 	 * we make the appropriate decision
+	 * 
+	 * This is effectively the main control logic for the application
+	 * 
 	 * @param userInput
 	 */
 	public void acceptUserInput(String userInput) {
@@ -185,9 +186,7 @@ public class ElevatorController {
 			case DESIRED_FLOOR:
 				// we've captured the desired floor, we can now activate the elevator
 				try {
-					this.car.setDesiredFloor(Integer.valueOf(userInput));
-					this.activeState = ElevatorState.ELEVATOR_IN_USE;
-					moveElevatorCar();
+					this.elevatorInUse(userInput);
 					
 				} catch (NumberFormatException nfex){
 					this.userInterface.unknownInput();
@@ -200,19 +199,7 @@ public class ElevatorController {
 			case ELEVATOR_IN_USE:
 				// here we are on a floor in the building, user has elected to go to another floor
 				try {
-					this.car.setDesiredFloor(Integer.valueOf(userInput));
-					if ( this.car.getDesiredFloor() == 1) {
-						this.activeState = ElevatorState.INIT_STATE;
-					} else {
-						this.activeState = ElevatorState.ELEVATOR_IN_USE;
-					}
-					moveElevatorCar();
-					if ( this.car.getDesiredFloor() == 1) {
-						
-						this.resetElevatorCar();
-						
-						this.userInterface.issueUserGreeting();
-					}
+					this.elevatorInUse(userInput);
 					
 				} catch (NumberFormatException nfex){
 					this.userInterface.unknownInput();
@@ -226,6 +213,34 @@ public class ElevatorController {
 	}
 	
 	/**
+	 * elevator in use makes sure that the state is set correctly for the position of the car in the 
+	 * building, calls the logic to actually move the elevator
+	 * and sets up the appropriate UI components based on where the passengers end up
+	 * @param userInput
+	 * @throws Exception
+	 */
+	private void elevatorInUse(String userInput) throws Exception {
+		
+		this.car.setDesiredFloor(Integer.valueOf(userInput));
+		if ( this.car.getDesiredFloor() == 1 && this.car.getCurrentFloor() != 1) {
+			this.activeState = ElevatorState.INIT_STATE;
+		} else {
+			this.activeState = ElevatorState.ELEVATOR_IN_USE;
+		}
+		
+		// here we execute logic to move the car
+		moveElevatorCar();
+		
+		if ( this.car.getCurrentFloor().intValue() == 1) {
+			this.resetElevatorCar();
+			this.userInterface.issueUserGreeting();
+		} else {
+			this.userInterface.elevatorWaiting(this.car.getCurrentFloor());
+		}
+	}
+	
+	
+	/**
 	 * moveElevatorCar is called from a couple of places, so its a method
 	 * this makes sure that we can go where we want to go and then calls the display
 	 * method which will show us the elevator moving
@@ -236,12 +251,58 @@ public class ElevatorController {
 		if (this.car.getDesiredFloor() > this.building.getNumberOfFloors()) {
 			String message = String.format("I'm sorry, this building only has %d floors, Please enter a valid floor number", this.building.getNumberOfFloors());
 			this.userInterface.getDesiredFloor(message);
-		} 
-		else {
-			int currentFloor = this.car.getCurrentFloor();
-			this.car.setCurrentFloor(this.car.getDesiredFloor());
-			this.userInterface.elevatorInUse(currentFloor, this.car.getDesiredFloor() );
+		} else if ( this.car.getDesiredFloor() == this.car.getCurrentFloor()) {
+			String message = String.format("I'm sorry, we're already on %d floor, Please choose another floor number", this.car.getCurrentFloor());
+			this.userInterface.getDesiredFloor(message);
 		}
+		else {
+			if ( goingUp(this.car)) {
+				this.goUp(car);
+			} else {
+				this.goDown(car);
+			}
+		}
+	}
+	
+	/**
+	 * goUp has logic to iterate through the floors until desired floor is reached
+	 * @param car
+	 * @throws Exception
+	 */
+	private void goUp(Car car) throws Exception {
+		
+		while ( car.getCurrentFloor() <  car.getDesiredFloor()) {
+			
+			this.userInterface.elevatorInUse(this.car.getCurrentFloor() );
+			Thread.sleep(2000);
+			this.car.setCurrentFloor(Integer.valueOf(car.getCurrentFloor().intValue() + 1));
+		}
+	}
+	
+	/**
+	 * goDown - decrement through the floors until desired floor is reach
+	 * @param car
+	 * @throws Exception
+	 */
+	private void goDown(Car car) throws Exception {
+		
+		while ( car.getCurrentFloor() >  car.getDesiredFloor() ) {
+			this.userInterface.elevatorInUse(this.car.getCurrentFloor() );
+			Thread.sleep(2000);
+			this.car.setCurrentFloor(Integer.valueOf(car.getCurrentFloor().intValue() - 1));
+		}
+	}
+	
+	/**
+	 * simple test to see if the passengers want to go up
+	 * @param car
+	 * @return
+	 */
+	private Boolean goingUp(Car car) {
+		if ( car.getDesiredFloor() > car.getCurrentFloor()) {
+			return true;
+		}
+		return false;
 	}
 	
 	/**

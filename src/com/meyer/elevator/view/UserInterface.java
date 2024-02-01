@@ -96,66 +96,20 @@ public class UserInterface {
 	 * @param desiredFloor
 	 * @throws Exception
 	 */
-	public void elevatorInUse(Integer currentFloor, Integer desiredFloor) throws Exception {
-		System.out.println("Off we go....");
-		if ( desiredFloor > currentFloor) {
-			goUp(currentFloor, desiredFloor);
-		} else if ( desiredFloor < currentFloor) {
-			goDown(currentFloor, desiredFloor);
-		} else {
-			System.out.println(" We are already on that floor, please select a different floor");
-			this.controller.acceptUserInput(scanner.next());
-			return;
-		}
-		if ( desiredFloor == 1) {
-			// we're good, basically starting over
-			return;
-		} else {
-			System.out.println(String.format(" Here we are, floor number %d", desiredFloor));
-			System.out.println("I'll wait here for you, when you're done, come back and tell me what floor you would like next");
-		}
+	public void elevatorInUse(Integer currentFloor)  {
+		
+		System.out.println(String.format(" Passing floor %d", currentFloor));
+		System.out.println("...");
+		
+	}
+	
+	public void elevatorWaiting(Integer currentFloor) {
+		System.out.println(String.format(" Here we are, floor number %d", currentFloor));
+		System.out.println("I'll wait here for you, when you're done, come back and tell me what floor you would like next");
 		this.controller.acceptUserInput(scanner.next());
 	}
 	
-	/**
-	 * goes up floors, the sleep is in there for dramatic effect
-	 * @param currentFloor
-	 * @param desiredFloor
-	 * @throws Exception
-	 */
-	private void goUp(Integer currentFloor, Integer desiredFloor) throws Exception {
-		
-		Integer numFloors = desiredFloor - currentFloor;
-		Integer idx = 0; 
-		
-		while ( idx <  numFloors) {
-			System.out.println(String.format("Passing floor %d", (currentFloor +idx)));
-			System.out.println("...");
-			
-			Thread.sleep(2000);
-			idx++;
-		}
-	}
 	
-	
-	/**
-	 * decrements down until we hit the desired floor;
-	 * @param currentFloor
-	 * @param desiredFloor
-	 * @throws Exception
-	 */
-	private void goDown(Integer currentFloor, Integer desiredFloor) throws Exception {
-		
-		Integer idx = Integer.valueOf(currentFloor.intValue());
-		
-		while ( idx >  desiredFloor ) {
-			System.out.println(String.format("Passing floor %d", idx));
-			System.out.println("...");
-			
-			Thread.sleep(2000);
-			idx--;
-		}
-	}
 	
 	public void evacuateTheBuilding() {
 		System.out.println("Oh my something terrible has happened! Please take the stairs and evacuate");
